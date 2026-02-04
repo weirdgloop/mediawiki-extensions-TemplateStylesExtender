@@ -19,7 +19,7 @@ jobs:
     - uses: repo-sync/github-sync@v2
       name: Sync repo to branch
       with:
-        source_repo: "wikimedia/${{ env.repo_name }}"
+        source_repo: "octfx/${{ env.repo_name }}"
         source_branch: ${{ env.upstream_branch }}
         destination_branch: weirdgloop/repo-sync
         github_token: ${{ secrets.GITHUB_TOKEN }}

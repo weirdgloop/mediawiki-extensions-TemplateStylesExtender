@@ -359,10 +359,35 @@ class MatcherFactoryExtender extends MatcherFactory {
 	/**
 	 * Wraps the parent `mathFunction` to allow using variables in the $typeMatcher
 	 *
+	 * For backward compatibility with css-sanitizer <=5.5.0.
+	 * Prefer mathFunction; it will fallback to calc.
+	 *
 	 * @param Matcher $typeMatcher
 	 * @return Matcher
 	 */
 	public function mathFunction( Matcher $typeMatcher ) {
+		if ( !$this->varEnabled ) {
+			return parent::mathFunction( $typeMatcher );
+		}
+
+		return parent::mathFunction( new Alternative( [
+			$typeMatcher,
+			new FunctionMatcher( 'var', new CustomPropertyMatcher() ),
+		] ) );
+	}
+
+	/**
+	 * Wraps the parent `mathFunction` to allow using variables in the $typeMatcher
+	 *
+	 * @param Matcher $typeMatcher
+	 * @return Matcher
+	 */
+	public function mathFunction( Matcher $typeMatcher ) {
+		// b/c for css-sanitizer <=5.5.0.
+		if ( !method_exists( get_parent_class( $this ),  'mathFunction' ) ) {
+			return $this->calc( $typeMatcher, 'number' );
+		}
+
 		if ( !$this->varEnabled ) {
 			return parent::mathFunction( $typeMatcher );
 		}
